@@ -43,12 +43,15 @@
  * Just evaluates the JavaScript and passes the result to completionHandler, if it exists.
  * Since this is defined in FLWebViewProvider, we can call this method regardless of the web view used.
 */
+// 更改此方法使其可以接收返回的字典，其实将其改为接收 id 类型应该会更好
 - (void) evaluateJavaScript: (NSString *) javaScriptString completionHandler: (void (^)(id, NSError *)) completionHandler
 {
-    NSString *string = [self stringByEvaluatingJavaScriptFromString: javaScriptString];
+    // 将获取到的 JSON 进行解析
+    NSData *jsonData = [[self stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"JSON.stringify(%@)",javaScriptString]] dataUsingEncoding:NSUTF8StringEncoding];
+    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingMutableContainers error:nil];
     
     if (completionHandler) {
-        completionHandler(string, nil);
+        completionHandler(dic, nil);
     }
 }
 
